@@ -4,8 +4,8 @@ import "./styles/main.scss";
 
 (async function() {
   // Loading external data
-  const inequality_df = await d3.csv('/data/table2.csv')
-  const census_wards_geojson = await d3.json('/data/census_wards_london.geojson')
+  const inequality_df = await d3.csv('./data/table2.csv')
+  const census_wards_geojson = await d3.json('./data/census_wards_london.geojson')
 
   const inequality_map = inequality_df.reduce((map, obj) => {
     map[obj["2011 Census Ward code"]] = parseFloat(obj["LE1,2 (years)"]);
