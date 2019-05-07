@@ -22,7 +22,7 @@ module.exports = {
   output: {
     path: paths.dist,
     filename: 'app.bundle.js',
-    publicPath: 'dist',
+    publicPath: './',
   },
   module: {
     rules: [{
