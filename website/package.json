@@ -4,7 +4,7 @@
   "description": "Basic D3.js project for learning purposes",
   "main": "src/app.js",
   "scripts": {
-    "start": "webpack-dev-server --model development --hot",
+    "start": "webpack-dev-server --config webpack.config.js --model development --hot",
     "dev": "webpack --mode development ./src/app.js --output ./dist/app.bundle.js",
     "build": "webpack --mode production ./src/app.js --output ./dist/app.bundle.js"
   },

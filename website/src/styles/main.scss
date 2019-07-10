@@ -31,6 +31,12 @@ html {
   padding: 0.5rem;
 }
 
+#postcode-input {
+  margin: auto;
+  display: inline-block;
+  width: 30ch;
+}
+
 #ward-dropdown {
   display: inline-block;
   width: 30ch;
@@ -48,7 +54,7 @@ html {
   padding-bottom: 0;
   transition: box-shadow 0.5s ease-in-out;
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
 }
 
 #tooltip {

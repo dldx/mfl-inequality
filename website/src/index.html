@@ -9,12 +9,14 @@
   <link rel="stylesheet" href="<%=htmlWebpackPlugin.files.chunks.main.css %>">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin="" />
   <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+  <script src="https://unpkg.com/d3@5.9.7/dist/d3.min.js"></script>
 </head>
 
 <body>
   <div id="wrapper">
 
     <div id="navbar">
+      <input type="text" id="postcode-input" placeholder="Enter a postcode..."></input>
 
       <select id="ward-dropdown"></select>
       <img id="logo" src="https://d3n8a8pro7vhmx.cloudfront.net/myfairlondon/sites/1/meta_images/original/MyFairLondon.png?1425998473" height=100 />

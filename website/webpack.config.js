@@ -51,8 +51,11 @@ module.exports = {
     contentBase: paths.dist,
     compress: true,
     port: '4800',
+    overlay: true,
     stats: 'errors-only',
-    watchContentBase: true
+    watchContentBase: true,
+    publicPath: './',
+    hot: true
   },
   devtool: "#inline-source-map",
   plugins: [
@@ -66,6 +69,7 @@ module.exports = {
       template: './index.html',
       filename: 'index.html'
     }),
+    new webpack.HotModuleReplacementPlugin(),
     new CopyWebpackPlugin([{
         from: paths.data,
         to: paths.dist + '/data'

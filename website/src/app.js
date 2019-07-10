@@ -1,8 +1,17 @@
 import * as d3 from 'd3'
 import "./styles/main.scss";
 
+function objectFlip(obj) {
+  const ret = {};
+  Object.keys(obj)
+    .forEach((key) => {
+      ret[obj[key]] = key;
+    });
+  return ret;
+}
 
 (async function() {
+  console.log("bloh")
   // Loading external data
   const inequality_df = await d3.csv('./data/table2.csv')
   const census_wards_geojson = await d3.json('./data/census_wards_london.geojson')
@@ -13,7 +22,12 @@ import "./styles/main.scss";
   }, {})
 
   const code_name_map = inequality_df.reduce((map, obj) => {
-    map[obj["2011 Census Ward code"]] = obj["2011 Census Ward name"];
+    map[obj["2011 Census Ward code"]] = `${obj["2011 Census Ward name"]} (${obj["Local authority name"]})`;
+    return map
+  }, {})
+
+  const name_code_map = inequality_df.reduce((map, obj) => {
+    map[obj["2011 Census Ward name"]] = obj["2011 Census Ward code"];
     return map
   }, {})
 
@@ -21,9 +35,27 @@ import "./styles/main.scss";
     .filter(d => d["Region"] == "London")
     .map(d => ({
       code: d["2011 Census Ward code"],
-      name: d["2011 Census Ward name"]
+      name: `${d["2011 Census Ward name"]} (${d["Local authority name"]})`
     }))
     .sort((a, b) => a.name < b.name ? -1 : 1)
+
+  const postcode_input = document.getElementById("postcode-input");
+  postcode_input.addEventListener("keydown", function(e) {
+    if (e.keyCode === 13) {
+      // Fetch Local authority for postcode
+      d3.json("https://mapit.mysociety.org/postcode/" + postcode_input.value)
+        .then(postcode_results => {
+
+          const ward_name = Object.entries(postcode_results["areas"])
+            .map(d => d[1])
+            .filter(d => d["type"] == "LBW")[0]["name"]
+
+          select_area(name_code_map[ward_name])
+        })
+
+    }
+  });
+
 
   d3.select("#ward-dropdown")
     .selectAll("option")
@@ -32,27 +64,31 @@ import "./styles/main.scss";
     .append("option")
     .attr("value", d => d.code)
     .html(d => d.name)
+
+  function select_area(selected_ward) {
+    areas.attr("fill", function() {
+      const ward_id = d3.select(this)
+        .attr("id")
+      if (ward_id == selected_ward) {
+        return "rgba(255,255,255,0.7)" //fill_color_scale(inequality_map[feature.properties.cmwd11cd])
+      } else {
+        return fill_color_scale(inequality_map[ward_id])
+      }
+    })
+    areas.attr("fill-opacity", function() {
+      const ward_id = d3.select(this)
+        .attr("id")
+      if (ward_id == selected_ward) {
+        return 0.9
+      } else {
+        return 0.6
+      }
+    })
+
+  }
   d3.select("#ward-dropdown")
     .on("change", function() {
-      const selected_ward = this.value
-      areas.attr("fill", function() {
-        const ward_id = d3.select(this)
-          .attr("id")
-        if (ward_id == selected_ward) {
-          return "white" //fill_color_scale(inequality_map[feature.properties.cmwd11cd])
-        } else {
-          return fill_color_scale(inequality_map[ward_id])
-        }
-      })
-      areas.attr("fill-opacity", function() {
-        const ward_id = d3.select(this)
-          .attr("id")
-        if (ward_id == selected_ward) {
-          return 0.9
-        } else {
-          return 0.6
-        }
-      })
+      select_area(this.value)
     })
 
   // Inequality color scale
