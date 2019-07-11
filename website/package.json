@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "d3": "^5.9.2",
+    "d3-svg-annotation": "^2.5.0",
     "tar": "^4.4.8"
   }
 }

@@ -48,8 +48,7 @@ html {
   max-width: 80ch;
   margin: 0 auto;
   background: white;
-  padding-top: 0;
-  padding-bottom: 0;
+  padding: 0 1rem;
   transition: box-shadow 0.5s ease-in-out;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -58,19 +57,34 @@ html {
 #tooltip {
   position: fixed;
   bottom: 0;
-  display: grid;
-  background: white;
-  width: 100%;
   z-index: 999;
+  width: 100%;
+  background: white;
+}
+
+#tooltip-data {
+  display: grid;
   height: 10ex;
   padding: 1rem;
   grid-template-columns: repeat(3, 1fr);
   grid-gap: 1rem;
 }
 
-#tooltip span {
+#tooltip-data span {
   padding: 0.5rem;
   display: inline-block;
   background: #e9ebe9;
   border-top: 2px solid grey;
+}
+
+#tooltip-scatter {
+  height: 10ex;
+  padding: 1rem;
+  grid-template-columns: 2fr 1fr;
+  grid-gap: 1rem;
+}
+
+#tooltip-scatter svg {
+  padding: 0.5rem;
+  overflow: visible;
 }
