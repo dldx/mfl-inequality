@@ -10,8 +10,41 @@ function objectFlip(obj) {
   return ret;
 }
 
+
 (async function() {
-  console.log("bloh")
+  function select_area(selected_ward) {
+    document.getElementById("ward-dropdown")
+      .value = selected_ward
+    d3.select("#tooltip")
+      .html(
+        `<span><b>Ward name</b> ${code_name_map[selected_ward]}</span>
+    <span><b>Life expectancy</b> ${inequality_map[selected_ward]} years</span>`
+      )
+    areas.attr("fill", function() {
+      const ward_id = d3.select(this)
+        .attr("id")
+      if (ward_id == selected_ward) {
+        return "rgba(255,255,255,0.7)" //fill_color_scale(inequality_map[feature.properties.cmwd11cd])
+      } else {
+        return fill_color_scale(inequality_map[ward_id])
+      }
+    })
+    areas.attr("fill-opacity", function() {
+      const ward_id = d3.select(this)
+        .attr("id")
+      if (ward_id == selected_ward) {
+        return 0.9
+      } else {
+        return 0.6
+      }
+    })
+
+  }
+
+  function click_then_select_area(selected_ward) {
+    code_layer_map[selected_ward].fire("click")
+    select_area(selected_ward)
+  }
   // Loading external data
   const inequality_df = await d3.csv('./data/table2.csv')
   const census_wards_geojson = await d3.json('./data/census_wards_london.geojson')
@@ -50,7 +83,9 @@ function objectFlip(obj) {
             .map(d => d[1])
             .filter(d => d["type"] == "LBW")[0]["name"]
 
-          select_area(name_code_map[ward_name])
+          click_then_select_area(name_code_map[ward_name])
+          document.getElementById("ward-dropdown")
+            .value = name_code_map[ward_name]
         })
 
     }
@@ -65,30 +100,9 @@ function objectFlip(obj) {
     .attr("value", d => d.code)
     .html(d => d.name)
 
-  function select_area(selected_ward) {
-    areas.attr("fill", function() {
-      const ward_id = d3.select(this)
-        .attr("id")
-      if (ward_id == selected_ward) {
-        return "rgba(255,255,255,0.7)" //fill_color_scale(inequality_map[feature.properties.cmwd11cd])
-      } else {
-        return fill_color_scale(inequality_map[ward_id])
-      }
-    })
-    areas.attr("fill-opacity", function() {
-      const ward_id = d3.select(this)
-        .attr("id")
-      if (ward_id == selected_ward) {
-        return 0.9
-      } else {
-        return 0.6
-      }
-    })
-
-  }
   d3.select("#ward-dropdown")
     .on("change", function() {
-      select_area(this.value)
+      click_then_select_area(this.value)
     })
 
   // Inequality color scale
@@ -120,11 +134,25 @@ function objectFlip(obj) {
           fillColor: fill_color_scale(inequality_map[feature.properties.cmwd11cd]),
           fillOpacity: 0.7
         }
+      },
+      onEachFeature: function(feature, layer) {
+        // assign bounds to feature
+        feature.properties.bounds_calculated = layer.getBounds()
+          .getCenter();
+        layer.on("click", function(e) {
+          select_area(layer.feature.properties.cmwd11cd)
+
+          map.flyTo(layer.getBounds()
+            .getCenter(), 12)
+        })
       }
     })
     .addTo(map)
 
+  const code_layer_map = {}
+
   geoJSONLayer.eachLayer(function(layer) {
+    code_layer_map[layer.feature.properties.cmwd11cd] = layer
     if (typeof layer._path != 'undefined') {
       layer._path.id = layer.feature.properties.cmwd11cd;
     } else {
@@ -132,7 +160,7 @@ function objectFlip(obj) {
         layer2._path.id = layer.feature.properties.cmwd11cd;
       });
     }
-  });
+  })
 
 
   var svg = d3.select("#map")
@@ -143,12 +171,23 @@ function objectFlip(obj) {
   var areas = d3.selectAll("path.leaflet-interactive")
 
   areas.on("mouseover", function() {
-    const ward_id = d3.select(this)
-      .attr("id")
+    update_tooltip(d3.select(this)
+      .attr("id"))
+  })
+
+  areas.on("mouseout", function() {
+    const selected_ward_id = document.getElementById("ward-dropdown")
+      .value
+    update_tooltip(selected_ward_id)
+  })
+
+
+  function update_tooltip(ward_id) {
     d3.select("#tooltip")
       .html(
         `<span><b>Ward name</b> ${code_name_map[ward_id]}</span>
-    <span><b>Life expectancy</b> ${inequality_map[ward_id]} years</span>`
+<span><b>Life expectancy</b> ${inequality_map[ward_id]} years</span>`
       )
-  })
+
+  }
 })();
